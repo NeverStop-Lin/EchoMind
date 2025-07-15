@@ -1,0 +1,4 @@
+Paul Graham is a computer scientist, entrepreneur, venture capitalist, and writer.
+He is best known for his work on the Lisp programming language, his co-founding of Viaweb (which was acquired by Yahoo to become Yahoo Store), and his co-founding of the Y Combinator seed capital firm.
+In 2005, he started Y Combinator with his wife Jessica Livingston, Trevor Blackwell, and Robert Morris. Y Combinator has since funded over 2,000 startups, including Dropbox, Airbnb, Stripe, and Reddit.
+He is also the author of several books and essays, including "On Lisp" (1993), "ANSI Common Lisp" (1995), and "Hackers & Painters" (2004).
