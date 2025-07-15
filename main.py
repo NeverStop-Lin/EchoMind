@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings, Document
 from llama_index.core.response_synthesizers.type import ResponseMode
-from llama_index.llms.gemini import Gemini
-from llama_index.embeddings.gemini import GeminiEmbedding
+from llama_index.llms.google_genai import GoogleGenAI
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 
 
 load_dotenv()
@@ -11,8 +11,8 @@ if not os.getenv("GEMINI_API_KEY"):
     raise ValueError("请设置 GEMINI_API_KEY 环境变量")
 
 # 将配置应用到全局 Settings
-llm = Gemini(model="gemini-2.5-flash")
-embed_model = GeminiEmbedding(model_name="gemini-embedding-001")
+llm = GoogleGenAI(model="gemini-2.5-flash")
+embed_model = GoogleGenAIEmbedding(model_name="gemini-embedding-001")
 Settings.llm = llm
 Settings.embed_model = embed_model
 
