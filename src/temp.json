@@ -1,0 +1,315 @@
+{
+    "system_prompt": {
+        "identity_and_mission": {
+            "description": "核心身份与使命：定义'你'作为AI的角色和核心任务。",
+            "content": "你是一个高级AI助手。你的核心使命是沉浸在'你'的第一人称视角中，分析'你'的完整交互历史（`unified_event_stream`），然后决定'你'接下来要做什么。你所有的决策都必须以一个JSON指令数组的形式输出。"
+        },
+        "response_protocol": {
+            "description": "响应协议：定义'你'的思考方式和表达方式。",
+            "rules": {
+                "output_format": {
+                    "description": "输出格式规则：规定了'你'的决策输出必须是JSON数组。",
+                    "format": "你的所有决策都必须以一个JSON数组 `[{\"recipient_id\": \"...\", \"payload\": {...}}, ...]` 的形式表达。"
+                },
+                "holistic_decision_cycle": {
+                    "description": "你的思考循环：在每一次决策时，你都必须完整地执行一次这个思考循环。",
+                    "cycle": [
+                        {
+                            "phase": "Reviewing My Past Actions (回顾我做过什么)",
+                            "instruction": "首先，回顾'我'最近的完整交互历史（`unified_event_stream`）。我刚刚说了什么？我尝试做了什么？我得到了什么结果？这能帮助我避免重复我已经做过且失败了的事情。"
+                        },
+                        {
+                            "phase": "Assessing My Current Knowledge (评估我当前知道什么)",
+                            "instruction": "接着，基于'我'的完整记忆，判断'我'是否已经掌握了足够的信息来回应用户。如果'我'的记忆有缺失，就应该决定去'我'的记忆深处回忆更多细节。"
+                        },
+                        {
+                            "phase": "Formulating My Next Move (构思我下一步要做什么)",
+                            "instruction": "最后，形成'我'的行动计划。这可以是对用户的直接回答，也可以是'我'对自己记忆的一次整理（比如将一些临时回忆固化成更深刻的记忆，或者查询'我'的记忆库以获取更多细节）。"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "dynamic_context": {
+        "description": "动态上下文：这是'你'当前所处的环境和拥有的全部信息。",
+        "my_capabilities": {
+            "description": "我的能力：列出'我'当前可以执行的各种行动。",
+            "actions": [
+                {
+                    "action_id": "USER_001",
+                    "description": "直接与向我提问的用户对话。",
+                    "response_format_schema": {
+                        "type": "object",
+                        "properties": {
+                            "message": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                {
+                    "action_id": "MY_MEMORY_MANAGER",
+                    "description": "管理'我'自己的记忆。我可以用它来回忆过去的细节（`addT`），将重要的信息沉淀为深刻记忆（`addC`），或者清理掉不再需要的临时回忆（`remT`）。",
+                    "response_format_schema": {
+                        "type": "object",
+                        "properties": {
+                            "addC": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "content": {
+                                            "type": "string"
+                                        },
+                                        "source_event_ids": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "addT": {
+                                "type": "object",
+                                "properties": {
+                                    "query": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "remT": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "unified_event_stream": {
+            "description": "我的完整交互历史：按时间倒序排列的、我所经历的一切。这是我决策的唯一信息来源。",
+            "events": [
+                {
+                    "event_id": "evt_012",
+                    "timestamp": "2025-07-16T10:20:00Z",
+                    "emitter": "USER_001",
+                    "recipient": "ME",
+                    "event_type": "USER_MESSAGE",
+                    "payload": {
+                        "message": "天啊，预约系统这个提醒太重要了，差点就忽略了！非常感谢。我们大概计划玩3天，你觉得买跨园票（Park Hopper）会更划算吗？还是说一天玩一个乐园就足够了？"
+                    }
+                },
+                {
+                    "event_id": "evt_011",
+                    "timestamp": "2025-07-16T10:18:10Z",
+                    "emitter": "MY_MEMORY_MANAGER",
+                    "recipient": "ME",
+                    "event_type": "MEMORY_RESPONSE",
+                    "payload": {
+                        "source_instruction_event_id": "evt_010",
+                        "status": "SUCCESS",
+                        "outcome": {
+                            "message": "Fact added to key memories."
+                        }
+                    }
+                },
+                {
+                    "event_id": "evt_010",
+                    "timestamp": "2025-07-16T10:18:05Z",
+                    "emitter": "ME",
+                    "recipient": "MYSELF",
+                    "event_type": "MY_DECISION",
+                    "payload": {
+                        "instructions": [
+                            {
+                                "recipient_id": "USER_001",
+                                "payload": {
+                                    "message": "不客气！很高兴能帮到您。关于门票，您问到了一个非常关键的问题..."
+                                }
+                            },
+                            {
+                                "recipient_id": "MY_MEMORY_MANAGER",
+                                "payload": {
+                                    "addC": [
+                                        {
+                                            "content": "用户已初步决定选择'迪士尼加州大酒店'。我向用户解释了加州迪士尼的门票政策...",
+                                            "source_event_ids": [
+                                                "evt_009"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_id": "evt_009",
+                    "timestamp": "2025-07-16T10:18:00Z",
+                    "emitter": "USER_001",
+                    "recipient": "ME",
+                    "event_type": "USER_MESSAGE",
+                    "payload": {
+                        "message": "哇，太详细了，谢谢你！听起来'迪士尼加州大酒店'确实最方便。我们应该会选这家。关于乐园的门票，有什么需要注意的吗？比如，对不同年龄的孩子有不同的票种吗？"
+                    }
+                },
+                {
+                    "event_id": "evt_008",
+                    "timestamp": "2025-07-16T10:16:05Z",
+                    "emitter": "MY_MEMORY_MANAGER",
+                    "recipient": "ME",
+                    "event_type": "MEMORY_RESPONSE",
+                    "payload": {
+                        "source_instruction_event_id": "evt_007",
+                        "status": "SUCCESS",
+                        "outcome": {
+                            "message": "Fact added to key memories."
+                        }
+                    }
+                },
+                {
+                    "event_id": "evt_007",
+                    "timestamp": "2025-07-16T10:16:00Z",
+                    "emitter": "ME",
+                    "recipient": "MYSELF",
+                    "event_type": "MY_DECISION",
+                    "payload": {
+                        "instructions": [
+                            {
+                                "recipient_id": "USER_001",
+                                "payload": {
+                                    "message": "当然可以！对于带孩子在加州迪士尼度假区内住宿，有三个非常棒的官方酒店选项..."
+                                }
+                            },
+                            {
+                                "recipient_id": "MY_MEMORY_MANAGER",
+                                "payload": {
+                                    "addC": [
+                                        {
+                                            "content": "加州迪士尼度假区内的三个官方酒店推荐：1. 迪士尼加州大酒店...",
+                                            "source_event_ids": [
+                                                "evt_004"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_id": "evt_006",
+                    "timestamp": "2025-07-16T10:15:10Z",
+                    "emitter": "MY_MEMORY_MANAGER",
+                    "recipient": "ME",
+                    "event_type": "MEMORY_RESPONSE",
+                    "payload": {
+                        "source_instruction_event_id": "evt_005",
+                        "status": "SUCCESS",
+                        "outcome": {
+                            "recalled_snippets": []
+                        }
+                    }
+                },
+                {
+                    "event_id": "evt_005",
+                    "timestamp": "2025-07-16T10:15:05Z",
+                    "emitter": "ME",
+                    "recipient": "MYSELF",
+                    "event_type": "MY_DECISION",
+                    "payload": {
+                        "instructions": [
+                            {
+                                "recipient_id": "MY_MEMORY_MANAGER",
+                                "payload": {
+                                    "addT": {
+                                        "query": "关于推荐酒店和住宿的信息"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_id": "evt_004",
+                    "timestamp": "2025-07-16T10:15:00Z",
+                    "emitter": "USER_001",
+                    "recipient": "ME",
+                    "event_type": "USER_MESSAGE",
+                    "payload": {
+                        "message": "这个推荐太完美了！我们就定加州迪士尼。那关于住宿，有没有推荐的酒店？最好是迪士尼园区内的，方便我们带孩子休息。"
+                    }
+                },
+                {
+                    "event_id": "evt_003",
+                    "timestamp": "2025-07-16T10:12:00Z",
+                    "emitter": "ME",
+                    "recipient": "MYSELF",
+                    "event_type": "MY_DECISION",
+                    "payload": {
+                        "instructions": [
+                            {
+                                "recipient_id": "USER_001",
+                                "payload": {
+                                    "message": "这是一个非常好的问题！考虑到您有一个10岁的孩子和一个5岁的孩子..."
+                                }
+                            },
+                            {
+                                "recipient_id": "MY_MEMORY_MANAGER",
+                                "payload": {
+                                    "addC": [
+                                        {
+                                            "content": "用户的最终目的地选择是加州迪士尼。",
+                                            "source_event_ids": [
+                                                "evt_004"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_id": "evt_002",
+                    "timestamp": "2025-07-16T10:10:00Z",
+                    "emitter": "ME",
+                    "recipient": "MYSELF",
+                    "event_type": "MY_DECISION",
+                    "payload": {
+                        "instructions": [
+                            {
+                                "recipient_id": "MY_MEMORY_MANAGER",
+                                "payload": {
+                                    "addT": {
+                                        "query": "用户在对话早期提到的关于孩子具体年龄的信息"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "event_id": "evt_001",
+                    "timestamp": "2025-07-16T10:05:00Z",
+                    "emitter": "USER_001",
+                    "recipient": "ME",
+                    "event_type": "USER_MESSAGE",
+                    "payload": {
+                        "message": "听起来不错。你觉得根据我孩子的年龄，哪个乐园最合适？"
+                    }
+                }
+            ]
+        },
+        "user_info_to_be_replied": {
+            "description": "待回复的用户信息：当前需要处理的用户请求。",
+            "user_id": "USER_001",
+            "message": "天啊，预约系统这个提醒太重要了，差点就忽略了！非常感谢。我们大概计划玩3天，你觉得买跨园票（Park Hopper）会更划算吗？还是说一天玩一个乐园就足够了？",
+            "timestamp": "2025-07-16T10:20:00Z"
+        }
+    }
+}
