@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 from ActionExecutor import ConversationContext, DialogueEvent
+from DataModels import get_utc_now
 
 
 class ContextEngine:
@@ -35,7 +36,7 @@ class ContextEngine:
     # --- 对应流程 步骤 10 ---
     def save_context(self, context: ConversationContext):
         """将修改后的完整上下文对象持久化保存。"""
-        context.last_updated = datetime.utcnow()
+        context.last_updated = get_utc_now()
         self.context_db.replace_one(
             {"session_id": context.session_id},
             context.model_dump(),

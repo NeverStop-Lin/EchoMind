@@ -3,12 +3,14 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 import uuid
 
+from DataModels import get_utc_now
+
 # 1. 对话档案馆中的基础事件单元
 class DialogueEvent(BaseModel):
     """对话档案馆中的一个原子事件"""
     event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     session_id: str # 标识属于哪一次对话
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=get_utc_now())
     emitter: Literal["USER", "AI", "SYSTEM"] # 事件发出者
     payload: Dict[str, Any] # 事件内容, e.g., {"message": "你好"} or {"query": "..."}
 
@@ -32,7 +34,7 @@ class CuratedMemory(BaseModel):
 class ConversationContext(BaseModel):
     """独立的、可持久化的上下文对象，包含AI的四象限记忆"""
     session_id: str
-    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    last_updated: datetime = Field(default_factory=get_utc_now())
 
     # 象限一: 历史的压缩信息
     q1_summary: str = "对话刚刚开始。"
