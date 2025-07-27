@@ -1,13 +1,16 @@
-from fastapi import FastAPI
+from fastapi import APIRouter
 
-app = FastAPI()
 
-@app.get("/")
+router = APIRouter()
+
+
+@router.get("/")
 def read_root():
     print("--- 正在处理根路径 / 的请求 ---")
     return {"message": "Hello, FastAPI222!"}
 
-@app.get("/items/{item_id}")
+
+@router.get("/items/{item_id}")
 def read_item(item_id: int, q: str | None = None):
     # 打印一些有用的信息
     print(f"请求已进入 read_item 函数")
@@ -21,5 +24,5 @@ def read_item(item_id: int, q: str | None = None):
 
     # 在返回前打印一条最终信息
     print("--- 请求处理完毕，即将发送响应 ---")
-    
+
     return {"item_id": item_id, "q": q}
